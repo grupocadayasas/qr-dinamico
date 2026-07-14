@@ -7,4 +7,4 @@ export const SUPABASE_ANON_KEY = 'sb_publishable_AhEVdj6pU5gkRrAwjRjcJg_lsYMz4mg
 
 // Ejemplo GitHub Pages: https://tuusuario.github.io/qr-contactos/
 // Déjalo vacío para que la aplicación detecte automáticamente la ruta actual.
-export const PUBLIC_BASE_URL = 'https://grupocadayasas.github.io/qr-dinamico/';
+export const PUBLIC_BASE_URL = 'https://grupocadayasas.github.io/qr-dinamico';
