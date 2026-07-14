@@ -1,0 +1,13 @@
+ACTUALIZACIÓN: LOGO CADAYA EN EL CENTRO DEL QR
+
+1. Cierra Live Server si está ejecutándose.
+2. Copia las carpetas "assets" y "js" de esta actualización.
+3. Pégalas dentro de tu carpeta generador-qr-vcard-dinamico.
+4. Cuando Windows pregunte, acepta reemplazar js/admin.js.
+5. Esta actualización NO incluye config.js, por lo que conserva tu URL y clave pública de Supabase.
+6. Abre otra vez el proyecto con Live Server y recarga con Ctrl + F5.
+
+Resultado:
+- Cuando la empresa contiene la palabra CADAYA, el QR muestra el logo oficial en el centro.
+- Para otras empresas se mantienen las iniciales del contacto.
+- El logo también queda incluido al descargar el QR en PNG.

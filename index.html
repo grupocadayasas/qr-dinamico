@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#b51f2e">
+  <title>Generador QR de contactos</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">QR</div>
+      <div>
+        <strong>Contact QR Studio</strong>
+        <span>Generador dinámico de contactos</span>
+      </div>
+    </div>
+    <button id="logoutButton" class="button button-ghost hidden" type="button">Cerrar sesión</button>
+  </header>
+
+  <main class="shell">
+    <section id="setupNotice" class="notice notice-warning hidden" role="alert">
+      <strong>Configuración pendiente.</strong>
+      Edita <code>js/config.js</code> con los datos públicos de tu proyecto Supabase.
+    </section>
+
+    <section id="loginView" class="auth-card">
+      <div>
+        <p class="eyebrow">Acceso administrativo</p>
+        <h1>Crea códigos QR que siempre conservan el mismo enlace</h1>
+        <p class="muted">Actualiza nombre, empresa, cargo o celular sin volver a imprimir el QR.</p>
+      </div>
+
+      <form id="loginForm" class="stack" autocomplete="on">
+        <label>
+          Correo
+          <input id="loginEmail" type="email" autocomplete="username" required placeholder="administrador@empresa.com">
+        </label>
+        <label>
+          Contraseña
+          <input id="loginPassword" type="password" autocomplete="current-password" required minlength="6">
+        </label>
+        <button class="button button-primary" type="submit">Ingresar</button>
+        <p id="loginMessage" class="form-message" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section id="appView" class="app-grid hidden">
+      <aside class="panel contacts-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Directorio</p>
+            <h2>Contactos</h2>
+          </div>
+          <button id="newContactButton" class="button button-primary button-small" type="button">+ Nuevo</button>
+        </div>
+        <label class="search-field">
+          <span class="sr-only">Buscar contacto</span>
+          <input id="searchInput" type="search" placeholder="Buscar por nombre o empresa">
+        </label>
+        <div id="contactsList" class="contacts-list" aria-live="polite"></div>
+      </aside>
+
+      <section class="panel editor-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Información editable</p>
+            <h2 id="editorTitle">Nuevo contacto</h2>
+          </div>
+          <span id="saveStatus" class="status-pill">Sin guardar</span>
+        </div>
+
+        <form id="contactForm" class="form-grid">
+          <input id="contactId" type="hidden">
+          <input id="contactSlug" type="hidden">
+
+          <label>
+            Nombre(s) *
+            <input id="firstName" required maxlength="80" placeholder="Danni">
+          </label>
+          <label>
+            Apellido(s)
+            <input id="lastName" maxlength="80" placeholder="Fajardo">
+          </label>
+          <label>
+            Empresa *
+            <input id="company" required maxlength="120" placeholder="GRUPO CADAYA SAS">
+          </label>
+          <label>
+            Cargo *
+            <input id="jobTitle" required maxlength="120" placeholder="Gerente Administrativo">
+          </label>
+          <label>
+            Celular *
+            <input id="mobile" required inputmode="tel" maxlength="30" placeholder="+57 300 000 0000">
+          </label>
+          <label>
+            Teléfono alterno
+            <input id="phone" inputmode="tel" maxlength="30">
+          </label>
+          <label>
+            Correo
+            <input id="email" type="email" maxlength="160" placeholder="contacto@empresa.com">
+          </label>
+          <label>
+            Página web
+            <input id="website" type="url" maxlength="240" placeholder="https://empresa.com">
+          </label>
+          <label class="full-width">
+            Dirección
+            <input id="address" maxlength="240" placeholder="Cali, Valle del Cauca">
+          </label>
+          <label>
+            WhatsApp
+            <input id="whatsapp" inputmode="tel" maxlength="30" placeholder="573000000000">
+          </label>
+          <label>
+            Color del QR
+            <input id="accentColor" type="color" value="#b51f2e">
+          </label>
+          <label class="full-width">
+            URL de foto o logo
+            <input id="photoUrl" type="url" maxlength="500" placeholder="https://.../foto.jpg">
+          </label>
+          <label class="full-width">
+            Nota
+            <textarea id="notes" rows="3" maxlength="500" placeholder="Información adicional opcional"></textarea>
+          </label>
+          <label class="checkbox-row full-width">
+            <input id="isActive" type="checkbox" checked>
+            <span>Tarjeta pública activa</span>
+          </label>
+
+          <div class="form-actions full-width">
+            <button class="button button-primary" type="submit">Guardar contacto</button>
+            <button id="deleteButton" class="button button-danger hidden" type="button">Eliminar</button>
+          </div>
+          <p id="formMessage" class="form-message full-width" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <aside class="panel preview-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Vista previa</p>
+            <h2>QR permanente</h2>
+          </div>
+        </div>
+
+        <div class="qr-frame">
+          <canvas id="qrCanvas" width="360" height="360" aria-label="Código QR del contacto"></canvas>
+        </div>
+
+        <div class="preview-card">
+          <div id="previewAvatar" class="avatar">QR</div>
+          <div>
+            <strong id="previewName">Nuevo contacto</strong>
+            <span id="previewRole">Cargo · Empresa</span>
+          </div>
+        </div>
+
+        <label>
+          Enlace público
+          <div class="copy-row">
+            <input id="publicUrl" readonly>
+            <button id="copyUrlButton" class="button button-ghost button-small" type="button">Copiar</button>
+          </div>
+        </label>
+
+        <div class="stack compact">
+          <button id="downloadQrButton" class="button button-primary" type="button">Descargar QR PNG</button>
+          <button id="openCardButton" class="button button-secondary" type="button">Abrir tarjeta pública</button>
+          <button id="downloadVcardButton" class="button button-secondary" type="button">Descargar vCard de prueba</button>
+        </div>
+
+        <p class="help-text">El QR apunta a una página dinámica. Al editar el contacto, el código impreso sigue funcionando.</p>
+      </aside>
+    </section>
+  </main>
+
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>
