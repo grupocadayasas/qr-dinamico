@@ -240,11 +240,61 @@ textarea { resize: vertical; }
   .photo-upload-controls .button { width: 100%; }
 }
 
-/* Centrado inteligente de fotografías */
-.photo-upload-section .field-label::after {
-  content: ' · centrado inteligente';
-  color: var(--accent);
-  font-size: .74rem;
-  font-weight: 800;
+/* Recorte manual de fotografías */
+body.modal-open { overflow: hidden; }
+.cropper-modal {
+  position: fixed; inset: 0; z-index: 1200; display: grid; place-items: center; padding: 18px;
 }
-.photo-preview { object-position: center center; }
+.cropper-backdrop {
+  position: absolute; inset: 0; background: rgba(16, 18, 24, .62); backdrop-filter: blur(4px);
+}
+.cropper-dialog {
+  position: relative; z-index: 1; width: min(1040px, 100%); max-height: min(92vh, 860px);
+  display: grid; grid-template-rows: auto 1fr auto; overflow: hidden;
+  background: #fff; border: 1px solid var(--line); border-radius: 24px; box-shadow: 0 30px 90px rgba(16,18,24,.28);
+}
+.cropper-header,
+.cropper-footer {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 18px 20px; border-bottom: 1px solid var(--line);
+}
+.cropper-footer { border-top: 1px solid var(--line); border-bottom: 0; justify-content: flex-end; }
+.cropper-body {
+  display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 0; min-height: 0;
+}
+.cropper-stage {
+  min-height: 460px; background: #f6f7fb; border-right: 1px solid var(--line); overflow: hidden;
+}
+.cropper-stage img { display: block; max-width: 100%; }
+.cropper-sidebar {
+  display: grid; align-content: start; gap: 18px; padding: 18px;
+}
+.cropper-preview-wrap { display: grid; gap: 10px; }
+.cropper-preview-circle {
+  width: 168px; height: 168px; margin: 0 auto; overflow: hidden; border-radius: 50%;
+  border: 4px solid #fff; box-shadow: 0 12px 30px rgba(31,34,41,.12); background: #f0f1f4;
+}
+.cropper-preview,
+.cropper-preview img { width: 100%; height: 100%; overflow: hidden; }
+.cropper-controls {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+}
+.cropper-controls .button:last-child { grid-column: 1 / -1; }
+.cropper-help .help-text { margin: 0; }
+
+@media (max-width: 860px) {
+  .cropper-dialog { max-height: 94vh; }
+  .cropper-body { grid-template-columns: 1fr; }
+  .cropper-stage { min-height: 360px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .cropper-sidebar { grid-template-columns: 1fr; }
+  .cropper-preview-circle { width: 140px; height: 140px; }
+}
+
+@media (max-width: 560px) {
+  .cropper-modal { padding: 10px; }
+  .cropper-header, .cropper-footer { padding: 14px; }
+  .cropper-sidebar { padding: 14px; }
+  .cropper-controls { grid-template-columns: 1fr; }
+  .cropper-stage { min-height: 300px; }
+  .cropper-preview-circle { width: 124px; height: 124px; }
+}

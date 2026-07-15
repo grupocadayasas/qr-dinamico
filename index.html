@@ -7,6 +7,7 @@
   <title>Generador QR de contactos</title>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="stylesheet" href="assets/styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
 </head>
 <body>
   <header class="topbar">
@@ -121,7 +122,7 @@
             <input id="accentColor" type="color" value="#b51f2e">
           </label>
           <div class="photo-upload-section full-width">
-            <span class="field-label">Foto del contacto</span>
+            <span class="field-label">Foto del contacto · recorte manual</span>
             <div class="photo-upload-box">
               <div class="photo-preview-frame">
                 <img id="photoPreview" class="photo-preview hidden" alt="Vista previa de la foto seleccionada">
@@ -131,7 +132,7 @@
                 <label class="button button-secondary photo-select-button" for="photoFile">Seleccionar foto desde el PC</label>
                 <input id="photoFile" class="sr-only" type="file" accept="image/jpeg,image/png,image/webp">
                 <button id="removePhotoButton" class="button button-ghost button-small hidden" type="button">Quitar foto</button>
-                <p class="help-text">Formatos JPG, PNG o WebP. Tamaño máximo: 5 MB. El sistema detecta el rostro, lo centra y genera una foto cuadrada optimizada automáticamente.</p>
+                <p class="help-text">Formatos JPG, PNG o WebP. Tamaño máximo: 5 MB. Luego podrás mover, hacer zoom y aplicar el recorte.</p>
                 <p id="photoUploadMessage" class="form-message" aria-live="polite"></p>
               </div>
             </div>
@@ -192,6 +193,46 @@
       </aside>
     </section>
   </main>
+
+  
+
+  <div id="photoCropModal" class="cropper-modal hidden" role="dialog" aria-modal="true" aria-labelledby="cropperTitle">
+    <div class="cropper-backdrop" data-close-cropper></div>
+    <div class="cropper-dialog">
+      <div class="cropper-header">
+        <div>
+          <p class="eyebrow">Ajuste manual</p>
+          <h2 id="cropperTitle">Recorta y centra la foto</h2>
+        </div>
+        <button id="closeCropperButton" class="button button-ghost button-small" type="button">Cerrar</button>
+      </div>
+      <div class="cropper-body">
+        <div class="cropper-stage">
+          <img id="cropImage" alt="Ajuste de foto">
+        </div>
+        <div class="cropper-sidebar">
+          <div class="cropper-preview-wrap">
+            <span class="field-label">Vista previa</span>
+            <div class="cropper-preview-circle">
+              <div class="cropper-preview" id="cropPreview"></div>
+            </div>
+          </div>
+          <div class="cropper-help">
+            <p class="help-text">Arrastra la foto para centrar el rostro. Usa los controles para acercar o alejar hasta lograr el encuadre deseado.</p>
+          </div>
+          <div class="cropper-controls">
+            <button id="zoomOutButton" class="button button-secondary" type="button">Alejar</button>
+            <button id="zoomInButton" class="button button-secondary" type="button">Acercar</button>
+            <button id="resetCropperButton" class="button button-ghost" type="button">Reiniciar</button>
+          </div>
+        </div>
+      </div>
+      <div class="cropper-footer">
+        <button id="cancelCropButton" class="button button-ghost" type="button">Cancelar</button>
+        <button id="applyCropButton" class="button button-primary" type="button">Aplicar recorte</button>
+      </div>
+    </div>
+  </div>
 
   <script type="module" src="js/admin.js"></script>
 </body>

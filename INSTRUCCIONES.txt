@@ -1,19 +1,19 @@
-ACTUALIZACIÓN: CENTRADO INTELIGENTE DE FOTOGRAFÍAS
+ACTUALIZACION - RECORTE MANUAL DE FOTOS
 
-Esta actualización analiza automáticamente cada foto al seleccionarla:
-- detecta el rostro principal;
-- lo centra con margen para cabello, cuello y hombros;
-- genera una imagen cuadrada de 1000 x 1000 px;
-- comprime la imagen para mejorar la carga;
-- si no detecta rostro, aplica un centrado automático seguro.
-
-ARCHIVOS PARA SUBIR A GITHUB
-Reemplaza estos archivos en la raíz del repositorio qr-dinamico:
+Sube al repositorio qr-dinamico y reemplaza solo estos archivos:
 - index.html
 - js/admin.js
 - assets/styles.css
 
-No modifica js/config.js, Supabase ni los contactos existentes.
-No es necesario ejecutar nuevamente el archivo SQL de Storage si la carga de fotos ya funciona.
+Que hace esta actualización:
+- Permite seleccionar una foto desde el PC.
+- Abre una ventana de recorte manual.
+- Puedes mover la foto libremente para centrar el rostro.
+- Puedes acercar o alejar la imagen.
+- Muestra vista previa circular.
+- Al pulsar "Aplicar recorte" genera una imagen cuadrada optimizada y la sube a Supabase.
 
-Después del Commit, espera 1 a 3 minutos y actualiza con Ctrl + F5.
+No modifica:
+- js/config.js
+- Supabase SQL
+- Contactos existentes

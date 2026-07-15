@@ -1,5 +1,6 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 import QRCode from 'https://cdn.jsdelivr.net/npm/qrcode@1.5.4/+esm';
+import Cropper from 'https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.esm.js';
 import { SUPABASE_URL, SUPABASE_ANON_KEY, PUBLIC_BASE_URL } from './config.js';
 import { clean, downloadVcard, fullName, initials, randomToken, slugify } from './shared.js';
 
@@ -8,10 +9,6 @@ const supabase = configured ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : nu
 const PHOTO_BUCKET = 'contact-photos';
 const PHOTO_MAX_BYTES = 5 * 1024 * 1024;
 const PHOTO_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
-const PHOTO_OUTPUT_SIZE = 1000;
-const PHOTO_DETECTION_MAX_SIZE = 1600;
-const MEDIAPIPE_WASM_ROOT = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/wasm';
-const FACE_MODEL_URL = 'https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/latest/blaze_face_short_range.tflite';
 
 const elements = {
   setupNotice: document.querySelector('#setupNotice'),
@@ -60,15 +57,25 @@ const elements = {
   downloadQrButton: document.querySelector('#downloadQrButton'),
   openCardButton: document.querySelector('#openCardButton'),
   downloadVcardButton: document.querySelector('#downloadVcardButton'),
+  photoCropModal: document.querySelector('#photoCropModal'),
+  cropImage: document.querySelector('#cropImage'),
+  cropPreview: document.querySelector('#cropPreview'),
+  closeCropperButton: document.querySelector('#closeCropperButton'),
+  cancelCropButton: document.querySelector('#cancelCropButton'),
+  applyCropButton: document.querySelector('#applyCropButton'),
+  resetCropperButton: document.querySelector('#resetCropperButton'),
+  zoomInButton: document.querySelector('#zoomInButton'),
+  zoomOutButton: document.querySelector('#zoomOutButton'),
 };
 
 let contacts = [];
 let activeContactId = null;
 let currentUserId = null;
 let qrRenderCounter = 0;
+let cropper = null;
+let pendingPhotoFile = null;
 const CADAYA_LOGO_URL = new URL('../assets/logo-cadaya.png', import.meta.url).href;
 let cadayaLogoPromise = null;
-let mediaPipeFaceDetectorPromise = null;
 
 function publicBaseUrl() {
   if (clean(PUBLIC_BASE_URL)) return clean(PUBLIC_BASE_URL).replace(/\/$/, '');
@@ -157,195 +164,77 @@ function photoExtension(file) {
   return extensions[file.type] || 'jpg';
 }
 
-async function createOrientedBitmap(file) {
-  if ('createImageBitmap' in window) {
-    try {
-      return await createImageBitmap(file, { imageOrientation: 'from-image' });
-    } catch {
-      return await createImageBitmap(file);
-    }
+function openCropperModal() {
+  elements.photoCropModal.classList.remove('hidden');
+  document.body.classList.add('modal-open');
+}
+
+function closeCropperModal(resetInput = true) {
+  elements.photoCropModal.classList.add('hidden');
+  document.body.classList.remove('modal-open');
+  if (cropper) {
+    cropper.destroy();
+    cropper = null;
   }
-
-  const objectUrl = URL.createObjectURL(file);
-  try {
-    const image = await new Promise((resolve, reject) => {
-      const element = new Image();
-      element.onload = () => resolve(element);
-      element.onerror = () => reject(new Error('No fue posible leer la imagen seleccionada.'));
-      element.src = objectUrl;
-    });
-    return image;
-  } finally {
-    URL.revokeObjectURL(objectUrl);
-  }
+  elements.cropImage.removeAttribute('src');
+  elements.cropPreview.innerHTML = '';
+  pendingPhotoFile = null;
+  if (resetInput) elements.photoFile.value = '';
 }
 
-function createDetectionCanvas(source) {
-  const sourceWidth = source.width || source.naturalWidth;
-  const sourceHeight = source.height || source.naturalHeight;
-  const scale = Math.min(1, PHOTO_DETECTION_MAX_SIZE / Math.max(sourceWidth, sourceHeight));
-  const canvas = document.createElement('canvas');
-  canvas.width = Math.max(1, Math.round(sourceWidth * scale));
-  canvas.height = Math.max(1, Math.round(sourceHeight * scale));
-  const context = canvas.getContext('2d', { alpha: false });
-  context.drawImage(source, 0, 0, canvas.width, canvas.height);
-  return canvas;
-}
-
-async function getMediaPipeFaceDetector() {
-  if (!mediaPipeFaceDetectorPromise) {
-    mediaPipeFaceDetectorPromise = (async () => {
-      const { FaceDetector, FilesetResolver } = await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/+esm');
-      const vision = await FilesetResolver.forVisionTasks(MEDIAPIPE_WASM_ROOT);
-      return FaceDetector.createFromOptions(vision, {
-        baseOptions: { modelAssetPath: FACE_MODEL_URL },
-        runningMode: 'IMAGE',
-        minDetectionConfidence: 0.45,
-        minSuppressionThreshold: 0.3,
-      });
-    })().catch(error => {
-      mediaPipeFaceDetectorPromise = null;
-      throw error;
-    });
-  }
-  return mediaPipeFaceDetectorPromise;
-}
-
-function largestDetection(detections = []) {
-  return detections.reduce((largest, detection) => {
-    const box = detection.boundingBox;
-    const area = (box?.width || 0) * (box?.height || 0);
-    const largestBox = largest?.boundingBox;
-    const largestArea = (largestBox?.width || 0) * (largestBox?.height || 0);
-    return area > largestArea ? detection : largest;
-  }, null);
-}
-
-async function detectMainFace(source) {
-  const detectionCanvas = createDetectionCanvas(source);
-  try {
-    const detector = await getMediaPipeFaceDetector();
-    const result = detector.detect(detectionCanvas);
-    const detection = largestDetection(result?.detections || []);
-    if (!detection?.boundingBox) return null;
-
-    const box = detection.boundingBox;
-    const sourceWidth = source.width || source.naturalWidth;
-    const sourceHeight = source.height || source.naturalHeight;
-    const scaleX = sourceWidth / detectionCanvas.width;
-    const scaleY = sourceHeight / detectionCanvas.height;
-    return {
-      x: box.originX * scaleX,
-      y: box.originY * scaleY,
-      width: box.width * scaleX,
-      height: box.height * scaleY,
-    };
-  } catch (error) {
-    console.warn('Detección facial no disponible; se usará centrado automático.', error);
-    return null;
-  }
-}
-
-function clamp(value, minimum, maximum) {
-  return Math.min(Math.max(value, minimum), maximum);
-}
-
-function smartSquareCrop(sourceWidth, sourceHeight, face) {
-  const shortestSide = Math.min(sourceWidth, sourceHeight);
-
-  if (!face) {
-    const size = shortestSide;
-    return {
-      x: (sourceWidth - size) / 2,
-      y: clamp(sourceHeight * 0.43 - size * 0.43, 0, sourceHeight - size),
-      size,
-      faceDetected: false,
-    };
-  }
-
-  const faceCenterX = face.x + face.width / 2;
-  const faceCenterY = face.y + face.height / 2;
-  // Espacio suficiente para frente, cabello, cuello y hombros sin acercar demasiado el rostro.
-  const preferredSize = Math.max(face.width * 3.25, face.height * 3.35, shortestSide * 0.58);
-  const size = Math.min(shortestSide, preferredSize);
-  const x = clamp(faceCenterX - size / 2, 0, sourceWidth - size);
-  // El rostro queda ligeramente arriba del centro para mostrar hombros y parte superior del torso.
-  const y = clamp(faceCenterY - size * 0.39, 0, sourceHeight - size);
-
-  return { x, y, size, faceDetected: true };
-}
-
-function canvasToBlob(canvas, type = 'image/webp', quality = 0.9) {
-  return new Promise((resolve, reject) => {
-    canvas.toBlob(blob => {
-      if (blob) resolve(blob);
-      else reject(new Error('No fue posible preparar la fotografía.'));
-    }, type, quality);
-  });
-}
-
-async function processPortraitPhoto(file) {
-  const source = await createOrientedBitmap(file);
-  try {
-    const sourceWidth = source.width || source.naturalWidth;
-    const sourceHeight = source.height || source.naturalHeight;
-    if (!sourceWidth || !sourceHeight) throw new Error('La imagen no tiene dimensiones válidas.');
-
-    const face = await detectMainFace(source);
-    const crop = smartSquareCrop(sourceWidth, sourceHeight, face);
-    const canvas = document.createElement('canvas');
-    canvas.width = PHOTO_OUTPUT_SIZE;
-    canvas.height = PHOTO_OUTPUT_SIZE;
-    const context = canvas.getContext('2d', { alpha: false });
-    context.imageSmoothingEnabled = true;
-    context.imageSmoothingQuality = 'high';
-    context.fillStyle = '#ffffff';
-    context.fillRect(0, 0, PHOTO_OUTPUT_SIZE, PHOTO_OUTPUT_SIZE);
-    context.drawImage(
-      source,
-      crop.x,
-      crop.y,
-      crop.size,
-      crop.size,
-      0,
-      0,
-      PHOTO_OUTPUT_SIZE,
-      PHOTO_OUTPUT_SIZE
-    );
-
-    let blob;
-    let outputType = 'image/webp';
-    try {
-      blob = await canvasToBlob(canvas, outputType, 0.9);
-    } catch {
-      outputType = 'image/jpeg';
-      blob = await canvasToBlob(canvas, outputType, 0.9);
-    }
-
-    const extension = outputType === 'image/webp' ? 'webp' : 'jpg';
-    const baseName = file.name.replace(/\.[^.]+$/, '') || 'foto-contacto';
-    const processedFile = new File([blob], `${baseName}-centrada.${extension}`, {
-      type: outputType,
-      lastModified: Date.now(),
-    });
-    return { file: processedFile, faceDetected: crop.faceDetected };
-  } finally {
-    if (typeof source.close === 'function') source.close();
-  }
-}
-async function uploadSelectedPhoto() {
-  const originalFile = elements.photoFile.files?.[0];
-  if (!originalFile) return;
-  if (!PHOTO_TYPES.has(originalFile.type)) {
+async function preparePhotoCrop() {
+  const file = elements.photoFile.files?.[0];
+  if (!file) return;
+  if (!PHOTO_TYPES.has(file.type)) {
     setMessage(elements.photoUploadMessage, 'Selecciona una imagen JPG, PNG o WebP.', true);
     elements.photoFile.value = '';
     return;
   }
-  if (originalFile.size > PHOTO_MAX_BYTES) {
+  if (file.size > PHOTO_MAX_BYTES) {
     setMessage(elements.photoUploadMessage, 'La foto supera el límite de 5 MB.', true);
     elements.photoFile.value = '';
     return;
   }
+  if (!currentUserId) {
+    setMessage(elements.photoUploadMessage, 'Debes iniciar sesión para subir la foto.', true);
+    elements.photoFile.value = '';
+    return;
+  }
+
+  pendingPhotoFile = file;
+  setMessage(elements.photoUploadMessage, 'Ajusta la foto y aplica el recorte.');
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    elements.cropImage.onload = () => {
+      if (cropper) cropper.destroy();
+      cropper = new Cropper(elements.cropImage, {
+        aspectRatio: 1,
+        viewMode: 1,
+        dragMode: 'move',
+        autoCropArea: 1,
+        responsive: true,
+        background: false,
+        guides: false,
+        center: false,
+        highlight: false,
+        movable: true,
+        zoomable: true,
+        scalable: false,
+        rotatable: false,
+        cropBoxResizable: false,
+        cropBoxMovable: false,
+        toggleDragModeOnDblclick: false,
+        preview: elements.cropPreview,
+      });
+      openCropperModal();
+    };
+    elements.cropImage.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function uploadProcessedPhoto(file) {
   if (!currentUserId) {
     setMessage(elements.photoUploadMessage, 'Debes iniciar sesión para subir la foto.', true);
     return;
@@ -356,20 +245,15 @@ async function uploadSelectedPhoto() {
     contact.slug = makeSlug(contact);
     elements.contactSlug.value = contact.slug;
   }
+
   const previousUrl = clean(elements.photoUrl.value);
+  const filename = `${contact.slug}-${Date.now()}-${randomToken(4)}.${photoExtension(file)}`;
+  const path = `${currentUserId}/${filename}`;
 
-  setMessage(elements.photoUploadMessage, 'Analizando rostro y centrando la fotografía…');
+  setMessage(elements.photoUploadMessage, 'Subiendo foto recortada…');
   elements.photoFile.disabled = true;
+  elements.applyCropButton.disabled = true;
   try {
-    const processed = await processPortraitPhoto(originalFile);
-    const file = processed.file;
-    const filename = `${contact.slug}-${Date.now()}-${randomToken(4)}.${photoExtension(file)}`;
-    const path = `${currentUserId}/${filename}`;
-
-    setMessage(elements.photoUploadMessage, processed.faceDetected
-      ? 'Rostro detectado y centrado. Subiendo foto optimizada…'
-      : 'No se detectó un rostro. Aplicando centrado automático y subiendo…');
-
     const { error } = await supabase.storage
       .from(PHOTO_BUCKET)
       .upload(path, file, {
@@ -385,17 +269,42 @@ async function uploadSelectedPhoto() {
     elements.photoUrl.value = data.publicUrl;
     setPhotoPreview(data.publicUrl);
     setSavedState(false);
-    setMessage(elements.photoUploadMessage, processed.faceDetected
-      ? 'Foto cargada con el rostro centrado. Guarda el contacto para confirmar el cambio.'
-      : 'Foto cargada con centrado automático. Guarda el contacto para confirmar el cambio.');
+    setMessage(elements.photoUploadMessage, 'Foto recortada y cargada. Guarda el contacto para confirmar el cambio.');
     if (previousUrl && previousUrl !== data.publicUrl) await removeStoredPhoto(previousUrl);
   } catch (error) {
-    console.error(error);
-    setMessage(elements.photoUploadMessage, `No se pudo procesar o subir la foto: ${error.message}`, true);
+    setMessage(elements.photoUploadMessage, `No se pudo subir la foto: ${error.message}`, true);
   } finally {
     elements.photoFile.disabled = false;
+    elements.applyCropButton.disabled = false;
     elements.photoFile.value = '';
   }
+}
+
+async function applyCropAndUpload() {
+  if (!cropper || !pendingPhotoFile) return;
+  const canvas = cropper.getCroppedCanvas({
+    width: 1000,
+    height: 1000,
+    imageSmoothingEnabled: true,
+    imageSmoothingQuality: 'high',
+    fillColor: '#ffffff',
+  });
+  if (!canvas) {
+    setMessage(elements.photoUploadMessage, 'No fue posible generar el recorte.', true);
+    return;
+  }
+
+  const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.92));
+  if (!blob) {
+    setMessage(elements.photoUploadMessage, 'No fue posible procesar la foto.', true);
+    return;
+  }
+
+  const baseName = pendingPhotoFile.name.replace(/\.[^.]+$/, '') || 'foto';
+  const processedFile = new File([blob], `${baseName}-recorte.jpg`, { type: 'image/jpeg' });
+  closeCropperModal(false);
+  await uploadProcessedPhoto(processedFile);
+  pendingPhotoFile = null;
 }
 
 async function removeCurrentPhoto() {
@@ -458,8 +367,6 @@ async function addQrCenterBadge(contact) {
   const logoSize = canvas.width * 0.165;
   const centerX = canvas.width / 2;
   const centerY = canvas.height / 2;
-  const x = centerX - badgeSize / 2;
-  const y = centerY - badgeSize / 2;
 
   ctx.save();
   ctx.fillStyle = '#ffffff';
@@ -471,13 +378,7 @@ async function addQrCenterBadge(contact) {
   if (isCadaya) {
     try {
       const logo = await loadCadayaLogo();
-      ctx.drawImage(
-        logo,
-        centerX - logoSize / 2,
-        centerY - logoSize / 2,
-        logoSize,
-        logoSize
-      );
+      ctx.drawImage(logo, centerX - logoSize / 2, centerY - logoSize / 2, logoSize, logoSize);
       ctx.restore();
       return;
     } catch (error) {
@@ -495,11 +396,6 @@ async function addQrCenterBadge(contact) {
   ctx.textBaseline = 'middle';
   ctx.fillText(initials(contact.first_name, contact.last_name), centerX, centerY + 2);
   ctx.restore();
-}
-
-function roundedRect(ctx, x, y, width, height, radius) {
-  ctx.beginPath();
-  ctx.roundRect(x, y, width, height, radius);
 }
 
 function resetForm() {
@@ -693,7 +589,7 @@ function bindEvents() {
   elements.contactForm.addEventListener('submit', saveContact);
   elements.deleteButton.addEventListener('click', deleteContact);
   elements.searchInput.addEventListener('input', renderContacts);
-  elements.photoFile.addEventListener('change', uploadSelectedPhoto);
+  elements.photoFile.addEventListener('change', preparePhotoCrop);
   elements.removePhotoButton.addEventListener('click', removeCurrentPhoto);
   elements.photoPreview.addEventListener('error', () => {
     elements.photoPreview.classList.add('hidden');
@@ -704,6 +600,17 @@ function bindEvents() {
   elements.downloadQrButton.addEventListener('click', downloadQr);
   elements.openCardButton.addEventListener('click', () => window.open(elements.publicUrl.value, '_blank', 'noopener'));
   elements.downloadVcardButton.addEventListener('click', () => downloadVcard(formData()));
+
+  elements.closeCropperButton.addEventListener('click', () => closeCropperModal());
+  elements.cancelCropButton.addEventListener('click', () => closeCropperModal());
+  elements.resetCropperButton.addEventListener('click', () => cropper?.reset());
+  elements.zoomInButton.addEventListener('click', () => cropper?.zoom(0.1));
+  elements.zoomOutButton.addEventListener('click', () => cropper?.zoom(-0.1));
+  elements.applyCropButton.addEventListener('click', applyCropAndUpload);
+  elements.photoCropModal.querySelector('[data-close-cropper]')?.addEventListener('click', () => closeCropperModal());
+  window.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !elements.photoCropModal.classList.contains('hidden')) closeCropperModal();
+  });
 }
 
 async function init() {
