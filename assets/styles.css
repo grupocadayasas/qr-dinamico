@@ -239,3 +239,12 @@ textarea { resize: vertical; }
   .photo-preview-frame { width: 82px; height: 82px; }
   .photo-upload-controls .button { width: 100%; }
 }
+
+/* Centrado inteligente de fotografías */
+.photo-upload-section .field-label::after {
+  content: ' · centrado inteligente';
+  color: var(--accent);
+  font-size: .74rem;
+  font-weight: 800;
+}
+.photo-preview { object-position: center center; }

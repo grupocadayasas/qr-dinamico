@@ -1,19 +1,19 @@
-ACTUALIZACIÓN: SUBIR FOTOS DESDE EL PC
+ACTUALIZACIÓN: CENTRADO INTELIGENTE DE FOTOGRAFÍAS
 
-1. En Supabase abre SQL Editor > New query.
-2. Copia y ejecuta todo el archivo supabase-storage-fotos.sql.
-3. En GitHub, repositorio qr-dinamico, sube el contenido de esta carpeta.
-4. Acepta reemplazar:
-   - index.html
-   - js/admin.js
-   - assets/styles.css
-5. No se modifica js/config.js.
-6. Espera el despliegue de GitHub Pages y actualiza con Ctrl + F5.
+Esta actualización analiza automáticamente cada foto al seleccionarla:
+- detecta el rostro principal;
+- lo centra con margen para cabello, cuello y hombros;
+- genera una imagen cuadrada de 1000 x 1000 px;
+- comprime la imagen para mejorar la carga;
+- si no detecta rostro, aplica un centrado automático seguro.
 
-Uso:
-- Entra al generador.
-- Abre o crea un contacto.
-- Pulsa “Seleccionar foto desde el PC”.
-- Elige JPG, PNG o WebP de máximo 5 MB.
-- Espera el mensaje “Foto cargada”.
-- Pulsa “Guardar contacto”.
+ARCHIVOS PARA SUBIR A GITHUB
+Reemplaza estos archivos en la raíz del repositorio qr-dinamico:
+- index.html
+- js/admin.js
+- assets/styles.css
+
+No modifica js/config.js, Supabase ni los contactos existentes.
+No es necesario ejecutar nuevamente el archivo SQL de Storage si la carga de fotos ya funciona.
+
+Después del Commit, espera 1 a 3 minutos y actualiza con Ctrl + F5.
