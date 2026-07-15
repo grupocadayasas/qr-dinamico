@@ -1,14 +1,19 @@
-ACTUALIZACION TARJETA CADAYA V3
+ACTUALIZACIÓN: SUBIR FOTOS DESDE EL PC
 
-En GitHub, repositorio qr-dinamico, sube y reemplaza:
-- contact.html
-- assets/styles.css
-- assets/logo-cadaya.png
+1. En Supabase abre SQL Editor > New query.
+2. Copia y ejecuta todo el archivo supabase-storage-fotos.sql.
+3. En GitHub, repositorio qr-dinamico, sube el contenido de esta carpeta.
+4. Acepta reemplazar:
+   - index.html
+   - js/admin.js
+   - assets/styles.css
+5. No se modifica js/config.js.
+6. Espera el despliegue de GitHub Pages y actualiza con Ctrl + F5.
 
-Cambios incluidos:
-- Logo y eslogan centrados y ampliados dentro del banner.
-- Botones Llamar, WhatsApp, Guardar contacto y Compartir tarjeta con iconos.
-- Dos filas de acciones con botones equilibrados, como en el diseño aprobado.
-- Se conservan iconos y estilo uniforme en los datos de contacto.
-
-No modifica js/config.js ni las claves de Supabase.
+Uso:
+- Entra al generador.
+- Abre o crea un contacto.
+- Pulsa “Seleccionar foto desde el PC”.
+- Elige JPG, PNG o WebP de máximo 5 MB.
+- Espera el mensaje “Foto cargada”.
+- Pulsa “Guardar contacto”.

@@ -5,6 +5,9 @@ import { clean, downloadVcard, fullName, initials, randomToken, slugify } from '
 
 const configured = !SUPABASE_URL.includes('PEGA_AQUI') && !SUPABASE_ANON_KEY.includes('PEGA_AQUI');
 const supabase = configured ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+const PHOTO_BUCKET = 'contact-photos';
+const PHOTO_MAX_BYTES = 5 * 1024 * 1024;
+const PHOTO_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
 
 const elements = {
   setupNotice: document.querySelector('#setupNotice'),
@@ -37,6 +40,11 @@ const elements = {
   whatsapp: document.querySelector('#whatsapp'),
   accentColor: document.querySelector('#accentColor'),
   photoUrl: document.querySelector('#photoUrl'),
+  photoFile: document.querySelector('#photoFile'),
+  photoPreview: document.querySelector('#photoPreview'),
+  photoPreviewPlaceholder: document.querySelector('#photoPreviewPlaceholder'),
+  removePhotoButton: document.querySelector('#removePhotoButton'),
+  photoUploadMessage: document.querySelector('#photoUploadMessage'),
   notes: document.querySelector('#notes'),
   isActive: document.querySelector('#isActive'),
   qrCanvas: document.querySelector('#qrCanvas'),
@@ -104,6 +112,108 @@ function setMessage(element, message = '', isError = false) {
 function setSavedState(saved) {
   elements.saveStatus.textContent = saved ? 'Guardado' : 'Sin guardar';
   elements.saveStatus.classList.toggle('saved', saved);
+}
+
+function setPhotoPreview(url = '') {
+  const value = clean(url);
+  elements.photoPreview.classList.toggle('hidden', !value);
+  elements.photoPreviewPlaceholder.classList.toggle('hidden', Boolean(value));
+  elements.removePhotoButton.classList.toggle('hidden', !value);
+  if (value) elements.photoPreview.src = value;
+  else elements.photoPreview.removeAttribute('src');
+}
+
+function storagePathFromPublicUrl(url = '') {
+  const marker = `/storage/v1/object/public/${PHOTO_BUCKET}/`;
+  const value = clean(url);
+  const markerIndex = value.indexOf(marker);
+  if (markerIndex < 0) return '';
+  const encodedPath = value.slice(markerIndex + marker.length).split('?')[0];
+  try {
+    return decodeURIComponent(encodedPath);
+  } catch {
+    return encodedPath;
+  }
+}
+
+async function removeStoredPhoto(url = '') {
+  const path = storagePathFromPublicUrl(url);
+  if (!path || !currentUserId || !path.startsWith(`${currentUserId}/`)) return;
+  const { error } = await supabase.storage.from(PHOTO_BUCKET).remove([path]);
+  if (error) console.warn('No fue posible eliminar la foto anterior:', error.message);
+}
+
+function photoExtension(file) {
+  const extensions = {
+    'image/jpeg': 'jpg',
+    'image/png': 'png',
+    'image/webp': 'webp',
+  };
+  return extensions[file.type] || 'jpg';
+}
+
+async function uploadSelectedPhoto() {
+  const file = elements.photoFile.files?.[0];
+  if (!file) return;
+  if (!PHOTO_TYPES.has(file.type)) {
+    setMessage(elements.photoUploadMessage, 'Selecciona una imagen JPG, PNG o WebP.', true);
+    elements.photoFile.value = '';
+    return;
+  }
+  if (file.size > PHOTO_MAX_BYTES) {
+    setMessage(elements.photoUploadMessage, 'La foto supera el límite de 5 MB.', true);
+    elements.photoFile.value = '';
+    return;
+  }
+  if (!currentUserId) {
+    setMessage(elements.photoUploadMessage, 'Debes iniciar sesión para subir la foto.', true);
+    return;
+  }
+
+  const contact = formData();
+  if (!contact.slug) {
+    contact.slug = makeSlug(contact);
+    elements.contactSlug.value = contact.slug;
+  }
+  const previousUrl = clean(elements.photoUrl.value);
+  const filename = `${contact.slug}-${Date.now()}-${randomToken(4)}.${photoExtension(file)}`;
+  const path = `${currentUserId}/${filename}`;
+
+  setMessage(elements.photoUploadMessage, 'Subiendo foto…');
+  elements.photoFile.disabled = true;
+  try {
+    const { error } = await supabase.storage
+      .from(PHOTO_BUCKET)
+      .upload(path, file, {
+        cacheControl: '3600',
+        contentType: file.type,
+        upsert: false,
+      });
+    if (error) throw error;
+
+    const { data } = supabase.storage.from(PHOTO_BUCKET).getPublicUrl(path);
+    if (!data?.publicUrl) throw new Error('No fue posible obtener la URL pública de la foto.');
+
+    elements.photoUrl.value = data.publicUrl;
+    setPhotoPreview(data.publicUrl);
+    setSavedState(false);
+    setMessage(elements.photoUploadMessage, 'Foto cargada. Guarda el contacto para confirmar el cambio.');
+    if (previousUrl && previousUrl !== data.publicUrl) await removeStoredPhoto(previousUrl);
+  } catch (error) {
+    setMessage(elements.photoUploadMessage, `No se pudo subir la foto: ${error.message}`, true);
+  } finally {
+    elements.photoFile.disabled = false;
+    elements.photoFile.value = '';
+  }
+}
+
+async function removeCurrentPhoto() {
+  const previousUrl = clean(elements.photoUrl.value);
+  elements.photoUrl.value = '';
+  setPhotoPreview('');
+  setSavedState(false);
+  setMessage(elements.photoUploadMessage, 'Foto retirada. Guarda el contacto para confirmar el cambio.');
+  await removeStoredPhoto(previousUrl);
 }
 
 function setAccent(color = '#b51f2e') {
@@ -204,6 +314,10 @@ function roundedRect(ctx, x, y, width, height, radius) {
 function resetForm() {
   activeContactId = null;
   elements.contactForm.reset();
+  elements.photoFile.value = '';
+  elements.photoUrl.value = '';
+  setPhotoPreview('');
+  setMessage(elements.photoUploadMessage);
   elements.contactId.value = '';
   elements.contactSlug.value = makeSlug({ first_name: '', last_name: '', company: '' });
   elements.accentColor.value = '#b51f2e';
@@ -232,6 +346,9 @@ function loadIntoForm(contact) {
   elements.whatsapp.value = contact.whatsapp || '';
   elements.accentColor.value = contact.accent_color || '#b51f2e';
   elements.photoUrl.value = contact.photo_url || '';
+  elements.photoFile.value = '';
+  setPhotoPreview(contact.photo_url || '');
+  setMessage(elements.photoUploadMessage);
   elements.notes.value = contact.notes || '';
   elements.isActive.checked = contact.is_active !== false;
   elements.editorTitle.textContent = fullName(contact);
@@ -330,6 +447,7 @@ async function deleteContact() {
     return;
   }
 
+  await removeStoredPhoto(contact.photo_url);
   contacts = contacts.filter(item => item.id !== contact.id);
   resetForm();
 }
@@ -384,6 +502,12 @@ function bindEvents() {
   elements.contactForm.addEventListener('submit', saveContact);
   elements.deleteButton.addEventListener('click', deleteContact);
   elements.searchInput.addEventListener('input', renderContacts);
+  elements.photoFile.addEventListener('change', uploadSelectedPhoto);
+  elements.removePhotoButton.addEventListener('click', removeCurrentPhoto);
+  elements.photoPreview.addEventListener('error', () => {
+    elements.photoPreview.classList.add('hidden');
+    elements.photoPreviewPlaceholder.classList.remove('hidden');
+  });
   elements.contactForm.addEventListener('input', () => { setSavedState(false); drawQr(); });
   elements.copyUrlButton.addEventListener('click', copyUrl);
   elements.downloadQrButton.addEventListener('click', downloadQr);

@@ -120,10 +120,23 @@
             Color del QR
             <input id="accentColor" type="color" value="#b51f2e">
           </label>
-          <label class="full-width">
-            URL de foto o logo
-            <input id="photoUrl" type="url" maxlength="500" placeholder="https://.../foto.jpg">
-          </label>
+          <div class="photo-upload-section full-width">
+            <span class="field-label">Foto del contacto</span>
+            <div class="photo-upload-box">
+              <div class="photo-preview-frame">
+                <img id="photoPreview" class="photo-preview hidden" alt="Vista previa de la foto seleccionada">
+                <span id="photoPreviewPlaceholder" class="photo-preview-placeholder" aria-hidden="true">Foto</span>
+              </div>
+              <div class="photo-upload-controls">
+                <label class="button button-secondary photo-select-button" for="photoFile">Seleccionar foto desde el PC</label>
+                <input id="photoFile" class="sr-only" type="file" accept="image/jpeg,image/png,image/webp">
+                <button id="removePhotoButton" class="button button-ghost button-small hidden" type="button">Quitar foto</button>
+                <p class="help-text">Formatos JPG, PNG o WebP. Tamaño máximo: 5 MB.</p>
+                <p id="photoUploadMessage" class="form-message" aria-live="polite"></p>
+              </div>
+            </div>
+            <input id="photoUrl" type="hidden">
+          </div>
           <label class="full-width">
             Nota
             <textarea id="notes" rows="3" maxlength="500" placeholder="Información adicional opcional"></textarea>
