@@ -102,7 +102,7 @@ textarea { resize: vertical; }
 .public-shell { width: min(520px, calc(100% - 24px)); margin: 0 auto; padding: 28px 0 34px; }
 .public-card { overflow: hidden; background: #fff; border: 1px solid rgba(0,0,0,.06); border-radius: 28px; box-shadow: 0 26px 80px rgba(22,24,30,.13); }
 .public-cover {
-  position: relative; min-height: 210px; display: flex; align-items: flex-start; justify-content: center;
+  position: relative; min-height: 222px; display: flex; align-items: flex-start; justify-content: center;
   padding: 22px 24px 0; overflow: hidden;
   background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 92%, #ff3348), color-mix(in srgb, var(--accent) 55%, #25040a));
 }
@@ -133,7 +133,7 @@ textarea { resize: vertical; }
 .public-brand-copy span { font-size: clamp(.96rem, 3.7vw, 1.18rem); font-weight: 900; letter-spacing: .105em; opacity: .99; }
 
 .public-content { position: relative; padding: 0 28px 30px; text-align: center; }
-.public-photo, .public-avatar { width: 112px; height: 112px; margin: -56px auto 18px; border: 6px solid #fff; border-radius: 50%; box-shadow: 0 10px 30px rgba(0,0,0,.14); }
+.public-photo, .public-avatar { width: 132px; height: 132px; margin: -66px auto 18px; border: 6px solid #fff; border-radius: 50%; box-shadow: 0 10px 30px rgba(0,0,0,.14); }
 .public-photo { object-fit: cover; background: #fff; }
 .public-avatar { display: grid; place-items: center; color: #fff; background: var(--accent); font-size: 2rem; font-weight: 900; }
 .public-content h1 { margin-bottom: 8px; font-size: clamp(2rem, 9vw, 3.1rem); }
@@ -204,7 +204,7 @@ textarea { resize: vertical; }
   .public-shell { padding-top: 12px; }
   .public-card { border-radius: 22px; }
   .public-content { padding-left: 20px; padding-right: 20px; }
-  .public-cover { min-height: 194px; padding: 18px 14px 0; }
+  .public-cover { min-height: 204px; padding: 18px 14px 0; }
   .public-brand-banner { gap: 14px; justify-content: center; }
   .public-brand-logo-wrap { width: 80px; height: 80px; }
   .public-brand-copy strong { font-size: 1.28rem; }
@@ -220,11 +220,11 @@ textarea { resize: vertical; }
 .photo-upload-section { display: grid; gap: 8px; }
 .field-label { color: #3f434d; font-size: .84rem; font-weight: 700; }
 .photo-upload-box {
-  display: grid; grid-template-columns: 112px 1fr; gap: 16px; align-items: center;
+  display: grid; grid-template-columns: 128px 1fr; gap: 16px; align-items: center;
   padding: 14px; background: #f8f8fa; border: 1px solid #dfe2e8; border-radius: 14px;
 }
 .photo-preview-frame {
-  display: grid; place-items: center; width: 112px; height: 112px; overflow: hidden;
+  display: grid; place-items: center; width: 128px; height: 128px; overflow: hidden;
   background: #fff; border: 1px dashed #c9cdd6; border-radius: 50%;
 }
 .photo-preview { display: block; width: 100%; height: 100%; object-fit: cover; }
@@ -235,8 +235,8 @@ textarea { resize: vertical; }
 .photo-upload-controls .form-message { flex: 1 0 100%; margin: 0; }
 
 @media (max-width: 520px) {
-  .photo-upload-box { grid-template-columns: 82px 1fr; gap: 12px; }
-  .photo-preview-frame { width: 82px; height: 82px; }
+  .photo-upload-box { grid-template-columns: 92px 1fr; gap: 12px; }
+  .photo-preview-frame { width: 92px; height: 92px; }
   .photo-upload-controls .button { width: 100%; }
 }
 
@@ -245,7 +245,7 @@ body.modal-open { overflow: hidden; }
 .cropper-modal { position: fixed; inset: 0; z-index: 1200; display: grid; place-items: center; padding: 10px; }
 .cropper-backdrop { position: absolute; inset: 0; background: rgba(16,18,24,.62); backdrop-filter: blur(4px); }
 .cropper-dialog {
-  position: relative; z-index: 1; width: min(880px, calc(100vw - 20px)); max-height: calc(100vh - 20px);
+  position: relative; z-index: 1; width: min(920px, calc(100vw - 20px)); max-height: calc(100vh - 20px);
   display: grid; grid-template-rows: auto minmax(0,1fr) auto; overflow: hidden;
   background: #fff; border: 1px solid var(--line); border-radius: 20px; box-shadow: 0 30px 90px rgba(16,18,24,.28);
 }
@@ -258,7 +258,7 @@ body.modal-open { overflow: hidden; }
 .cropper-footer { border-top: 1px solid var(--line); justify-content: flex-end; }
 .cropper-body { display: grid; grid-template-columns: minmax(0,1fr) 210px; min-height: 0; overflow: hidden; }
 .cropper-stage {
-  position: relative; height: clamp(270px,55vh,500px); min-height: 0; background: #f6f7fb;
+  position: relative; height: clamp(320px,60vh,560px); min-height: 0; background: #f6f7fb;
   border-right: 1px solid var(--line); overflow: hidden;
 }
 .cropper-stage img { display: block; max-width: 100%; }
@@ -266,7 +266,7 @@ body.modal-open { overflow: hidden; }
 .cropper-sidebar { min-height: 0; display: grid; align-content: start; gap: 12px; padding: 14px; overflow-y: auto; }
 .cropper-preview-wrap { display: grid; gap: 7px; }
 .cropper-preview-circle {
-  width: 112px; height: 112px; margin: 0 auto; overflow: hidden; border-radius: 50%; border: 4px solid #fff;
+  width: 126px; height: 126px; margin: 0 auto; overflow: hidden; border-radius: 50%; border: 4px solid #fff;
   box-shadow: 0 10px 24px rgba(31,34,41,.12); background: #f0f1f4;
 }
 .cropper-preview, .cropper-preview img { width: 100%; height: 100%; overflow: hidden; }
@@ -275,11 +275,11 @@ body.modal-open { overflow: hidden; }
 .cropper-controls .button:last-child { grid-column: 1 / -1; }
 .cropper-help .help-text { margin: 0; font-size: .78rem; line-height: 1.35; }
 @media (max-width: 860px) {
-  .cropper-dialog { width: min(680px, calc(100vw - 16px)); max-height: calc(100vh - 16px); }
+  .cropper-dialog { width: min(720px, calc(100vw - 16px)); max-height: calc(100vh - 16px); }
   .cropper-body { grid-template-columns: 1fr; overflow-y: auto; }
-  .cropper-stage { height: clamp(260px,50vh,430px); border-right: 0; border-bottom: 1px solid var(--line); }
+  .cropper-stage { height: clamp(290px,54vh,470px); border-right: 0; border-bottom: 1px solid var(--line); }
   .cropper-sidebar { grid-template-columns: 130px 1fr; align-items: center; overflow: visible; }
-  .cropper-preview-circle { width: 104px; height: 104px; }
+  .cropper-preview-circle { width: 112px; height: 112px; }
   .cropper-controls, .cropper-help { grid-column: 2; }
 }
 @media (max-width: 560px) {
@@ -287,22 +287,22 @@ body.modal-open { overflow: hidden; }
   .cropper-dialog { width: calc(100vw - 12px); max-height: calc(100vh - 12px); border-radius: 16px; }
   .cropper-header, .cropper-footer { padding: 10px 12px; }
   .cropper-header h2 { font-size: .92rem; }
-  .cropper-stage { height: clamp(230px,44vh,340px); }
+  .cropper-stage { height: clamp(250px,48vh,380px); }
   .cropper-sidebar { grid-template-columns: 96px 1fr; gap: 10px; padding: 10px 12px; }
-  .cropper-preview-circle { width: 88px; height: 88px; }
+  .cropper-preview-circle { width: 94px; height: 94px; }
   .cropper-controls { gap: 6px; }
   .cropper-controls .button { min-height: 34px; font-size: .72rem; }
   .cropper-footer .button { min-height: 38px; padding: 8px 12px; }
 }
 @media (max-height: 760px) and (min-width: 861px) {
-  .cropper-dialog { width: min(820px, calc(100vw - 20px)); }
-  .cropper-stage { height: clamp(250px,48vh,390px); }
-  .cropper-preview-circle { width: 96px; height: 96px; }
+  .cropper-dialog { width: min(860px, calc(100vw - 20px)); }
+  .cropper-stage { height: clamp(290px,54vh,450px); }
+  .cropper-preview-circle { width: 104px; height: 104px; }
   .cropper-sidebar { gap: 9px; padding: 10px 12px; }
   .cropper-header, .cropper-footer { padding-top: 9px; padding-bottom: 9px; }
 }
 @media (max-height: 620px) {
-  .cropper-stage { height: 42vh; min-height: 220px; }
-  .cropper-preview-circle { width: 78px; height: 78px; }
+  .cropper-stage { height: 46vh; min-height: 240px; }
+  .cropper-preview-circle { width: 84px; height: 84px; }
   .cropper-help { display: none; }
 }

@@ -1,13 +1,12 @@
-ACTUALIZACIÓN V2 — EDITOR DE RECORTE COMPACTO
+ACTUALIZACIÓN V3 — EDITOR COMPACTO + FOTO MÁS GRANDE
 
 Reemplaza únicamente:
 - assets/styles.css
 
 Mejoras:
-- El editor cabe en pantalla con el navegador al 100%.
-- Ajusta automáticamente su altura al tamaño del monitor.
-- Mantiene visibles el recuadro, la vista previa y los botones.
-- En pantallas pequeñas reorganiza los controles.
-- Ya no es necesario reducir el zoom al 50%.
+- El recuadro de edición de foto ahora es más grande.
+- La vista previa de la foto dentro del formulario también es más grande.
+- La foto del contacto en la tarjeta pública quedó un poco más grande.
+- Mantiene el ajuste compacto para que el editor siga cabiendo con el navegador al 100%.
 
-Después del Commit, espera entre 1 y 3 minutos y actualiza con Ctrl + F5.
+Después del Commit, espera 1–3 minutos y actualiza con Ctrl + F5.
