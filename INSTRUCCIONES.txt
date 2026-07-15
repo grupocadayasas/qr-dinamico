@@ -1,25 +1,13 @@
-ACTUALIZACIÓN DE TARJETA PÚBLICA — GRUPO CADAYA SAS
+ACTUALIZACION TARJETA CADAYA V2
 
-Incluye:
-- Logo de Cadaya y eslogan “SER CADAYA ES SER RENTABLE” en el banner superior.
-- Dirección clicable que abre Google Maps.
-- Instagram corporativo @grupo_cadaya_s.a.s con enlace directo.
-- Instagram agregado también a la vCard descargable para contactos de Cadaya.
+Subir al repositorio qr-dinamico reemplazando:
+- contact.html
+- assets/styles.css
+- assets/logo-cadaya.png
+- js/contact.js
+- js/shared.js
 
-INSTALACIÓN EN GITHUB
-1. Descomprime este ZIP.
-2. En el repositorio qr-dinamico, usa Add file > Upload files.
-3. Arrastra TODO el contenido interno de esta actualización (contact.html y las carpetas assets y js).
-4. GitHub mostrará que reemplazará estos archivos:
-   - contact.html
-   - assets/styles.css
-   - assets/logo-cadaya.png
-   - js/contact.js
-   - js/shared.js
-5. Escribe como mensaje: “Mejora tarjeta Cadaya: logo, Maps e Instagram”.
-6. Pulsa Commit changes.
-7. Espera 1–3 minutos y abre la tarjeta con Ctrl + F5.
-
-IMPORTANTE
-- Esta actualización NO incluye ni modifica js/config.js.
-- No borra la conexión con Supabase ni la URL pública configurada.
+Cambios incluidos:
+- Banner superior integrado visualmente con logo y eslogan.
+- Iconos visuales en celular, telefono, correo, sitio web, direccion, Instagram e informacion.
+- Ajuste visual para que el texto de Informacion use la misma jerarquia y color del resto.

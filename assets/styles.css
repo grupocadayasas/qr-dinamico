@@ -101,21 +101,35 @@ textarea { resize: vertical; }
 .public-page { min-height: 100vh; background: radial-gradient(circle at top, color-mix(in srgb, var(--accent) 12%, white), var(--canvas) 45%); }
 .public-shell { width: min(520px, calc(100% - 24px)); margin: 0 auto; padding: 28px 0 34px; }
 .public-card { overflow: hidden; background: #fff; border: 1px solid rgba(0,0,0,.06); border-radius: 28px; box-shadow: 0 26px 80px rgba(22,24,30,.13); }
-.public-cover { min-height: 172px; display: flex; align-items: flex-start; justify-content: center; padding: 18px 22px 0; background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 45%, #111)); }
+.public-cover {
+  position: relative; min-height: 188px; display: flex; align-items: flex-start; justify-content: flex-start;
+  padding: 20px 24px 0; overflow: hidden;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 92%, #ff3348), color-mix(in srgb, var(--accent) 55%, #25040a));
+}
+.public-cover::before,
+.public-cover::after {
+  content: ''; position: absolute; left: -8%; right: -8%; border-radius: 50%; pointer-events: none;
+}
+.public-cover::before {
+  bottom: 34px; height: 110px; background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 94%, #ff2644), color-mix(in srgb, var(--accent) 76%, #751120));
+  opacity: .72; transform: rotate(-1.8deg);
+}
+.public-cover::after {
+  bottom: 18px; height: 86px; background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 84%, white), color-mix(in srgb, var(--accent) 88%, #952033));
+  opacity: .28; transform: rotate(2deg);
+}
 .public-brand-banner {
-  display: inline-flex; align-items: center; justify-content: center; gap: 14px;
-  min-width: min(390px, 100%); padding: 9px 18px 9px 11px;
-  color: #fff; background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.26);
-  border-radius: 22px; box-shadow: 0 10px 28px rgba(0,0,0,.14); backdrop-filter: blur(6px);
+  position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: flex-start; gap: 14px;
+  width: 100%; min-width: 0; padding: 0; color: #fff; background: transparent; border: 0; box-shadow: none;
 }
 .public-brand-logo-wrap {
-  flex: 0 0 auto; display: grid; place-items: center; width: 72px; height: 72px;
-  padding: 5px; background: #fff; border-radius: 50%; box-shadow: 0 8px 22px rgba(0,0,0,.20);
+  flex: 0 0 auto; display: grid; place-items: center; width: 78px; height: 78px;
+  padding: 6px; background: #fff; border-radius: 50%; box-shadow: 0 8px 22px rgba(0,0,0,.18);
 }
 .public-brand-logo { display: block; width: 100%; height: 100%; object-fit: contain; }
-.public-brand-copy { display: grid; gap: 2px; text-align: left; line-height: 1; }
-.public-brand-copy strong { font-size: clamp(1rem, 4vw, 1.28rem); letter-spacing: .095em; }
-.public-brand-copy span { font-size: clamp(.73rem, 3vw, .9rem); font-weight: 800; letter-spacing: .16em; opacity: .96; }
+.public-brand-copy { display: grid; gap: 4px; text-align: left; line-height: .98; }
+.public-brand-copy strong { font-size: clamp(1.15rem, 4.5vw, 1.55rem); letter-spacing: .08em; font-weight: 900; }
+.public-brand-copy span { font-size: clamp(.84rem, 3.5vw, 1.06rem); font-weight: 900; letter-spacing: .12em; opacity: .98; }
 
 .public-content { position: relative; padding: 0 28px 30px; text-align: center; }
 .public-photo, .public-avatar { width: 112px; height: 112px; margin: -56px auto 18px; border: 6px solid #fff; border-radius: 50%; box-shadow: 0 10px 30px rgba(0,0,0,.14); }
@@ -126,13 +140,22 @@ textarea { resize: vertical; }
 .primary-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .primary-actions .button:only-child { grid-column: 1 / -1; }
 .contact-details { display: grid; gap: 0; margin: 26px 0 0; text-align: left; border-top: 1px solid var(--line); }
-.contact-details > div { display: grid; grid-template-columns: 90px 1fr; gap: 14px; padding: 15px 2px; border-bottom: 1px solid var(--line); }
-.contact-details dt { color: var(--muted); font-size: .78rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
-.contact-details dd { min-width: 0; margin: 0; overflow-wrap: anywhere; }
+.contact-details > div { display: grid; grid-template-columns: minmax(132px, 154px) 1fr; gap: 14px; padding: 15px 2px; border-bottom: 1px solid var(--line); align-items: start; }
+.contact-details dt {
+  display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: .78rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: .06em; line-height: 1.1;
+}
+.detail-icon {
+  flex: 0 0 auto; display: inline-grid; place-items: center; width: 24px; height: 24px;
+  color: var(--accent);
+}
+.detail-icon svg { width: 100%; height: 100%; display: block; }
+.contact-details dd { min-width: 0; margin: 0; overflow-wrap: anywhere; color: var(--accent); font-weight: 700; line-height: 1.35; }
 .contact-details a { color: var(--accent); font-weight: 700; text-decoration: none; }
 .contact-details a:hover { text-decoration: underline; }
-.maps-link::after, .instagram-link::after { content: ' ↗'; font-size: .82em; }
+.maps-link::after, .instagram-link::after, #websiteLink::after { content: ' ↗'; font-size: .82em; }
 .instagram-link { word-break: break-word; }
+#notesText { color: var(--accent); font-weight: 700; }
 .public-footer { padding: 20px 0 0; color: var(--muted); text-align: center; font-size: .75rem; }
 .state-card { display: grid; place-items: center; min-height: 380px; padding: 40px; text-align: center; }
 .state-card .public-avatar { margin: 0 auto 18px; }
@@ -163,8 +186,11 @@ textarea { resize: vertical; }
   .public-shell { padding-top: 12px; }
   .public-card { border-radius: 22px; }
   .public-content { padding-left: 20px; padding-right: 20px; }
-  .public-cover { min-height: 166px; padding-left: 12px; padding-right: 12px; }
-  .public-brand-banner { gap: 10px; padding: 8px 12px 8px 8px; border-radius: 18px; }
-  .public-brand-logo-wrap { width: 62px; height: 62px; }
-  .contact-details > div { grid-template-columns: 82px 1fr; gap: 10px; }
+  .public-cover { min-height: 172px; padding-left: 16px; padding-right: 16px; }
+  .public-brand-banner { gap: 12px; }
+  .public-brand-logo-wrap { width: 64px; height: 64px; }
+  .public-brand-copy strong { font-size: 1.04rem; }
+  .public-brand-copy span { font-size: .82rem; }
+  .contact-details > div { grid-template-columns: 1fr; gap: 8px; }
+  .contact-details dt { margin-bottom: 2px; }
 }
