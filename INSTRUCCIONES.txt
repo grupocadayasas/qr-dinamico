@@ -1,13 +1,14 @@
-ACTUALIZACION TARJETA CADAYA V2
+ACTUALIZACION TARJETA CADAYA V3
 
-Subir al repositorio qr-dinamico reemplazando:
+En GitHub, repositorio qr-dinamico, sube y reemplaza:
 - contact.html
 - assets/styles.css
 - assets/logo-cadaya.png
-- js/contact.js
-- js/shared.js
 
 Cambios incluidos:
-- Banner superior integrado visualmente con logo y eslogan.
-- Iconos visuales en celular, telefono, correo, sitio web, direccion, Instagram e informacion.
-- Ajuste visual para que el texto de Informacion use la misma jerarquia y color del resto.
+- Logo y eslogan centrados y ampliados dentro del banner.
+- Botones Llamar, WhatsApp, Guardar contacto y Compartir tarjeta con iconos.
+- Dos filas de acciones con botones equilibrados, como en el diseño aprobado.
+- Se conservan iconos y estilo uniforme en los datos de contacto.
+
+No modifica js/config.js ni las claves de Supabase.

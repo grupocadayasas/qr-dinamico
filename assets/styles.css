@@ -102,8 +102,8 @@ textarea { resize: vertical; }
 .public-shell { width: min(520px, calc(100% - 24px)); margin: 0 auto; padding: 28px 0 34px; }
 .public-card { overflow: hidden; background: #fff; border: 1px solid rgba(0,0,0,.06); border-radius: 28px; box-shadow: 0 26px 80px rgba(22,24,30,.13); }
 .public-cover {
-  position: relative; min-height: 188px; display: flex; align-items: flex-start; justify-content: flex-start;
-  padding: 20px 24px 0; overflow: hidden;
+  position: relative; min-height: 210px; display: flex; align-items: flex-start; justify-content: center;
+  padding: 22px 24px 0; overflow: hidden;
   background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 92%, #ff3348), color-mix(in srgb, var(--accent) 55%, #25040a));
 }
 .public-cover::before,
@@ -119,17 +119,18 @@ textarea { resize: vertical; }
   opacity: .28; transform: rotate(2deg);
 }
 .public-brand-banner {
-  position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: flex-start; gap: 14px;
-  width: 100%; min-width: 0; padding: 0; color: #fff; background: transparent; border: 0; box-shadow: none;
+  position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; gap: 18px;
+  width: auto; max-width: 100%; min-width: 0; margin: 0 auto; padding: 0;
+  color: #fff; background: transparent; border: 0; box-shadow: none;
 }
 .public-brand-logo-wrap {
-  flex: 0 0 auto; display: grid; place-items: center; width: 78px; height: 78px;
-  padding: 6px; background: #fff; border-radius: 50%; box-shadow: 0 8px 22px rgba(0,0,0,.18);
+  flex: 0 0 auto; display: grid; place-items: center; width: 92px; height: 92px;
+  padding: 7px; background: #fff; border-radius: 50%; box-shadow: 0 9px 24px rgba(0,0,0,.20);
 }
 .public-brand-logo { display: block; width: 100%; height: 100%; object-fit: contain; }
-.public-brand-copy { display: grid; gap: 4px; text-align: left; line-height: .98; }
-.public-brand-copy strong { font-size: clamp(1.15rem, 4.5vw, 1.55rem); letter-spacing: .08em; font-weight: 900; }
-.public-brand-copy span { font-size: clamp(.84rem, 3.5vw, 1.06rem); font-weight: 900; letter-spacing: .12em; opacity: .98; }
+.public-brand-copy { display: grid; gap: 5px; text-align: left; line-height: .96; }
+.public-brand-copy strong { font-size: clamp(1.35rem, 5vw, 1.78rem); letter-spacing: .075em; font-weight: 900; }
+.public-brand-copy span { font-size: clamp(.96rem, 3.7vw, 1.18rem); font-weight: 900; letter-spacing: .105em; opacity: .99; }
 
 .public-content { position: relative; padding: 0 28px 30px; text-align: center; }
 .public-photo, .public-avatar { width: 112px; height: 112px; margin: -56px auto 18px; border: 6px solid #fff; border-radius: 50%; box-shadow: 0 10px 30px rgba(0,0,0,.14); }
@@ -137,8 +138,25 @@ textarea { resize: vertical; }
 .public-avatar { display: grid; place-items: center; color: #fff; background: var(--accent); font-size: 2rem; font-weight: 900; }
 .public-content h1 { margin-bottom: 8px; font-size: clamp(2rem, 9vw, 3.1rem); }
 .public-role { margin-bottom: 22px; color: var(--muted); font-size: 1.02rem; }
-.primary-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.primary-actions .button:only-child { grid-column: 1 / -1; }
+.public-action-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 12px; }
+.secondary-actions { margin-top: 12px; }
+.public-action {
+  min-height: 56px; gap: 11px; padding: 12px 15px; border-radius: 14px;
+  font-size: .98rem; font-weight: 850; box-shadow: 0 7px 20px rgba(22,24,30,.06);
+}
+.public-action .action-icon { flex: 0 0 auto; display: inline-grid; place-items: center; width: 25px; height: 25px; }
+.public-action .action-icon svg { display: block; width: 100%; height: 100%; }
+.public-action-call { color: #fff; background: linear-gradient(135deg, var(--accent), var(--accent-dark)); border-color: transparent; }
+.public-action-call:hover { background: var(--accent-dark); }
+.public-action-whatsapp { color: var(--ink); background: #fff; border-color: #d9dce3; }
+.public-action-whatsapp .whatsapp-icon { color: #16a34a; }
+.public-action-outline { color: var(--ink); background: #fff; border-color: #d9dce3; }
+.public-action-outline .action-icon { color: var(--accent); }
+.public-action-outline:hover, .public-action-whatsapp:hover { background: #f8f8fa; }
+
+#contactCard .button-save { width: auto; margin-top: 0; color: inherit; background: inherit; font-size: inherit; }
+#contactCard .button-ghost { color: inherit; background: #fff; border-color: #d9dce3; }
+
 .contact-details { display: grid; gap: 0; margin: 26px 0 0; text-align: left; border-top: 1px solid var(--line); }
 .contact-details > div { display: grid; grid-template-columns: minmax(132px, 154px) 1fr; gap: 14px; padding: 15px 2px; border-bottom: 1px solid var(--line); align-items: start; }
 .contact-details dt {
@@ -186,11 +204,14 @@ textarea { resize: vertical; }
   .public-shell { padding-top: 12px; }
   .public-card { border-radius: 22px; }
   .public-content { padding-left: 20px; padding-right: 20px; }
-  .public-cover { min-height: 172px; padding-left: 16px; padding-right: 16px; }
-  .public-brand-banner { gap: 12px; }
-  .public-brand-logo-wrap { width: 64px; height: 64px; }
-  .public-brand-copy strong { font-size: 1.04rem; }
-  .public-brand-copy span { font-size: .82rem; }
+  .public-cover { min-height: 194px; padding: 18px 14px 0; }
+  .public-brand-banner { gap: 14px; justify-content: center; }
+  .public-brand-logo-wrap { width: 80px; height: 80px; }
+  .public-brand-copy strong { font-size: 1.28rem; }
+  .public-brand-copy span { font-size: .94rem; }
+  .public-action-grid { grid-template-columns: 1fr 1fr; gap: 9px; }
+  .public-action { min-height: 52px; padding: 10px 8px; gap: 8px; font-size: .84rem; }
+  .public-action .action-icon { width: 22px; height: 22px; }
   .contact-details > div { grid-template-columns: 1fr; gap: 8px; }
   .contact-details dt { margin-bottom: 2px; }
 }
