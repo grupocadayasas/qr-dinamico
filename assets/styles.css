@@ -240,61 +240,69 @@ textarea { resize: vertical; }
   .photo-upload-controls .button { width: 100%; }
 }
 
-/* Recorte manual de fotografías */
+/* Recorte manual de fotografías - versión compacta */
 body.modal-open { overflow: hidden; }
-.cropper-modal {
-  position: fixed; inset: 0; z-index: 1200; display: grid; place-items: center; padding: 18px;
-}
-.cropper-backdrop {
-  position: absolute; inset: 0; background: rgba(16, 18, 24, .62); backdrop-filter: blur(4px);
-}
+.cropper-modal { position: fixed; inset: 0; z-index: 1200; display: grid; place-items: center; padding: 10px; }
+.cropper-backdrop { position: absolute; inset: 0; background: rgba(16,18,24,.62); backdrop-filter: blur(4px); }
 .cropper-dialog {
-  position: relative; z-index: 1; width: min(1040px, 100%); max-height: min(92vh, 860px);
-  display: grid; grid-template-rows: auto 1fr auto; overflow: hidden;
-  background: #fff; border: 1px solid var(--line); border-radius: 24px; box-shadow: 0 30px 90px rgba(16,18,24,.28);
+  position: relative; z-index: 1; width: min(880px, calc(100vw - 20px)); max-height: calc(100vh - 20px);
+  display: grid; grid-template-rows: auto minmax(0,1fr) auto; overflow: hidden;
+  background: #fff; border: 1px solid var(--line); border-radius: 20px; box-shadow: 0 30px 90px rgba(16,18,24,.28);
 }
-.cropper-header,
-.cropper-footer {
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  padding: 18px 20px; border-bottom: 1px solid var(--line);
+.cropper-header, .cropper-footer {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; background: #fff;
 }
-.cropper-footer { border-top: 1px solid var(--line); border-bottom: 0; justify-content: flex-end; }
-.cropper-body {
-  display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 0; min-height: 0;
-}
+.cropper-header { border-bottom: 1px solid var(--line); }
+.cropper-header .eyebrow { margin-bottom: 3px; }
+.cropper-header h2 { font-size: 1rem; }
+.cropper-footer { border-top: 1px solid var(--line); justify-content: flex-end; }
+.cropper-body { display: grid; grid-template-columns: minmax(0,1fr) 210px; min-height: 0; overflow: hidden; }
 .cropper-stage {
-  min-height: 460px; background: #f6f7fb; border-right: 1px solid var(--line); overflow: hidden;
+  position: relative; height: clamp(270px,55vh,500px); min-height: 0; background: #f6f7fb;
+  border-right: 1px solid var(--line); overflow: hidden;
 }
 .cropper-stage img { display: block; max-width: 100%; }
-.cropper-sidebar {
-  display: grid; align-content: start; gap: 18px; padding: 18px;
-}
-.cropper-preview-wrap { display: grid; gap: 10px; }
+.cropper-stage .cropper-container { width: 100% !important; height: 100% !important; }
+.cropper-sidebar { min-height: 0; display: grid; align-content: start; gap: 12px; padding: 14px; overflow-y: auto; }
+.cropper-preview-wrap { display: grid; gap: 7px; }
 .cropper-preview-circle {
-  width: 168px; height: 168px; margin: 0 auto; overflow: hidden; border-radius: 50%;
-  border: 4px solid #fff; box-shadow: 0 12px 30px rgba(31,34,41,.12); background: #f0f1f4;
+  width: 112px; height: 112px; margin: 0 auto; overflow: hidden; border-radius: 50%; border: 4px solid #fff;
+  box-shadow: 0 10px 24px rgba(31,34,41,.12); background: #f0f1f4;
 }
-.cropper-preview,
-.cropper-preview img { width: 100%; height: 100%; overflow: hidden; }
-.cropper-controls {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-}
+.cropper-preview, .cropper-preview img { width: 100%; height: 100%; overflow: hidden; }
+.cropper-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.cropper-controls .button { min-height: 38px; padding: 8px 10px; font-size: .78rem; }
 .cropper-controls .button:last-child { grid-column: 1 / -1; }
-.cropper-help .help-text { margin: 0; }
-
+.cropper-help .help-text { margin: 0; font-size: .78rem; line-height: 1.35; }
 @media (max-width: 860px) {
-  .cropper-dialog { max-height: 94vh; }
-  .cropper-body { grid-template-columns: 1fr; }
-  .cropper-stage { min-height: 360px; border-right: 0; border-bottom: 1px solid var(--line); }
-  .cropper-sidebar { grid-template-columns: 1fr; }
-  .cropper-preview-circle { width: 140px; height: 140px; }
+  .cropper-dialog { width: min(680px, calc(100vw - 16px)); max-height: calc(100vh - 16px); }
+  .cropper-body { grid-template-columns: 1fr; overflow-y: auto; }
+  .cropper-stage { height: clamp(260px,50vh,430px); border-right: 0; border-bottom: 1px solid var(--line); }
+  .cropper-sidebar { grid-template-columns: 130px 1fr; align-items: center; overflow: visible; }
+  .cropper-preview-circle { width: 104px; height: 104px; }
+  .cropper-controls, .cropper-help { grid-column: 2; }
 }
-
 @media (max-width: 560px) {
-  .cropper-modal { padding: 10px; }
-  .cropper-header, .cropper-footer { padding: 14px; }
-  .cropper-sidebar { padding: 14px; }
-  .cropper-controls { grid-template-columns: 1fr; }
-  .cropper-stage { min-height: 300px; }
-  .cropper-preview-circle { width: 124px; height: 124px; }
+  .cropper-modal { padding: 6px; }
+  .cropper-dialog { width: calc(100vw - 12px); max-height: calc(100vh - 12px); border-radius: 16px; }
+  .cropper-header, .cropper-footer { padding: 10px 12px; }
+  .cropper-header h2 { font-size: .92rem; }
+  .cropper-stage { height: clamp(230px,44vh,340px); }
+  .cropper-sidebar { grid-template-columns: 96px 1fr; gap: 10px; padding: 10px 12px; }
+  .cropper-preview-circle { width: 88px; height: 88px; }
+  .cropper-controls { gap: 6px; }
+  .cropper-controls .button { min-height: 34px; font-size: .72rem; }
+  .cropper-footer .button { min-height: 38px; padding: 8px 12px; }
+}
+@media (max-height: 760px) and (min-width: 861px) {
+  .cropper-dialog { width: min(820px, calc(100vw - 20px)); }
+  .cropper-stage { height: clamp(250px,48vh,390px); }
+  .cropper-preview-circle { width: 96px; height: 96px; }
+  .cropper-sidebar { gap: 9px; padding: 10px 12px; }
+  .cropper-header, .cropper-footer { padding-top: 9px; padding-bottom: 9px; }
+}
+@media (max-height: 620px) {
+  .cropper-stage { height: 42vh; min-height: 220px; }
+  .cropper-preview-circle { width: 78px; height: 78px; }
+  .cropper-help { display: none; }
 }

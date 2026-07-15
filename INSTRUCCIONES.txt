@@ -1,19 +1,13 @@
-ACTUALIZACION - RECORTE MANUAL DE FOTOS
+ACTUALIZACIÓN V2 — EDITOR DE RECORTE COMPACTO
 
-Sube al repositorio qr-dinamico y reemplaza solo estos archivos:
-- index.html
-- js/admin.js
+Reemplaza únicamente:
 - assets/styles.css
 
-Que hace esta actualización:
-- Permite seleccionar una foto desde el PC.
-- Abre una ventana de recorte manual.
-- Puedes mover la foto libremente para centrar el rostro.
-- Puedes acercar o alejar la imagen.
-- Muestra vista previa circular.
-- Al pulsar "Aplicar recorte" genera una imagen cuadrada optimizada y la sube a Supabase.
+Mejoras:
+- El editor cabe en pantalla con el navegador al 100%.
+- Ajusta automáticamente su altura al tamaño del monitor.
+- Mantiene visibles el recuadro, la vista previa y los botones.
+- En pantallas pequeñas reorganiza los controles.
+- Ya no es necesario reducir el zoom al 50%.
 
-No modifica:
-- js/config.js
-- Supabase SQL
-- Contactos existentes
+Después del Commit, espera entre 1 y 3 minutos y actualiza con Ctrl + F5.
