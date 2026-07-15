@@ -64,6 +64,9 @@ export function buildVcard(contact) {
   if (clean(contact.phone)) lines.push(`TEL;TYPE=WORK,VOICE:${escapeVcard(normalizePhone(contact.phone))}`);
   if (clean(contact.email)) lines.push(`EMAIL;TYPE=INTERNET,WORK:${escapeVcard(contact.email)}`);
   if (clean(contact.website)) lines.push(`URL:${escapeVcard(safeWebsite(contact.website))}`);
+  if (/cadaya/i.test(clean(contact.company))) {
+    lines.push('X-SOCIALPROFILE;TYPE=instagram:https://www.instagram.com/grupo_cadaya_s.a.s/');
+  }
   if (clean(contact.address)) lines.push(`ADR;TYPE=WORK:;;${escapeVcard(contact.address)};;;;`);
   if (clean(contact.photo_url)) lines.push(`PHOTO;VALUE=URI:${escapeVcard(contact.photo_url)}`);
   if (clean(contact.notes)) lines.push(`NOTE:${escapeVcard(contact.notes)}`);

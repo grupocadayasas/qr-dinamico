@@ -2,11 +2,14 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
 import { clean, downloadVcard, fullName, initials, normalizePhone, normalizeWhatsApp, safeWebsite } from './shared.js';
 
+const CADAYA_INSTAGRAM_URL = 'https://www.instagram.com/grupo_cadaya_s.a.s/';
+
 const elements = {
   loadingCard: document.querySelector('#loadingCard'),
   errorCard: document.querySelector('#errorCard'),
   errorText: document.querySelector('#errorText'),
   contactCard: document.querySelector('#contactCard'),
+  cadayaBrandBanner: document.querySelector('#cadayaBrandBanner'),
   publicPhoto: document.querySelector('#publicPhoto'),
   publicInitials: document.querySelector('#publicInitials'),
   publicCompany: document.querySelector('#publicCompany'),
@@ -25,7 +28,9 @@ const elements = {
   websiteRow: document.querySelector('#websiteRow'),
   websiteLink: document.querySelector('#websiteLink'),
   addressRow: document.querySelector('#addressRow'),
-  addressText: document.querySelector('#addressText'),
+  addressLink: document.querySelector('#addressLink'),
+  instagramRow: document.querySelector('#instagramRow'),
+  instagramLink: document.querySelector('#instagramLink'),
   notesRow: document.querySelector('#notesRow'),
   notesText: document.querySelector('#notesText'),
 };
@@ -57,6 +62,11 @@ function render(data) {
   elements.publicJobTitle.textContent = data.job_title || '';
   elements.publicInitials.textContent = initials(data.first_name, data.last_name);
   elements.publicInitials.style.background = accent;
+
+  const isCadaya = /cadaya/i.test(data.company || '');
+  elements.cadayaBrandBanner.classList.toggle('hidden', !isCadaya);
+  elements.instagramRow.classList.toggle('hidden', !isCadaya);
+  if (isCadaya) elements.instagramLink.href = CADAYA_INSTAGRAM_URL;
 
   if (clean(data.photo_url)) {
     elements.publicPhoto.src = data.photo_url;
@@ -91,7 +101,11 @@ function render(data) {
     elements.websiteLink.href = safeWebsite(data.website);
     elements.websiteLink.textContent = data.website.replace(/^https?:\/\//i, '').replace(/\/$/, '');
   });
-  setOptionalRow(elements.addressRow, data.address, () => { elements.addressText.textContent = data.address; });
+  setOptionalRow(elements.addressRow, data.address, () => {
+    elements.addressLink.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(clean(data.address))}`;
+    elements.addressLink.textContent = data.address;
+    elements.addressLink.setAttribute('aria-label', `Abrir ${data.address} en Google Maps`);
+  });
   setOptionalRow(elements.notesRow, data.notes, () => { elements.notesText.textContent = data.notes; });
 
   elements.saveContactButton.addEventListener('click', () => downloadVcard(contact));
